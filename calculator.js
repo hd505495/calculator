@@ -18,7 +18,10 @@ operands.forEach((operand) => {
 
 operators.forEach((operator) => {
   operator.addEventListener('click', function(event) {
-    operandsArray.push(inputArray.join(""));
+    op = inputArray.join("");
+    if (op !== "") {
+      operandsArray.push(op);
+    }
     operatorsArray.push(event.target.innerHTML);
     inputArray.length = 0;
     oneDecimal = false;
@@ -28,20 +31,30 @@ operators.forEach((operator) => {
 equals.addEventListener('click', function(event) {
   operandsArray.push(inputArray.join(""));
   console.log(`operands array = ${operandsArray}`);
+  console.log(`operands array length = ${operandsArray.length}`);
   console.log(`operators array = ${operatorsArray}`);
-  for (let i = 0; i < operandsArray.length - 1; i++) {
-    /*if (operatorsArray[i] === '/' && operandsArray[i+1] === '0')
-      display.innerHTML = 'Try again buddy';*/
-    operandsArray[i+1] = operate(operatorsArray[i], parseFloat(operandsArray[i]), parseFloat(operandsArray[i+1]));
-    console.log(`preliminary result of iteration ${i} = ${operandsArray[i+1]}`);
+  if ((operatorsArray.length > 0) && (operandsArray.length === operatorsArray.length + 1)) {
+    for (let i = 0; i < operandsArray.length - 1; i++) {
+      operandsArray[i+1] = operate(operatorsArray[i], parseFloat(operandsArray[i]), parseFloat(operandsArray[i+1]));
+      console.log(`preliminary result of iteration ${i} = ${operandsArray[i+1]}`);
+    }
+    let result = parseFloat(operandsArray.pop());
+    display.innerHTML = 
+    ((result===Infinity || result === -Infinity)?"Try again buddy":((result%1)?result.toFixed(2):result));
+
+    inputArray.length = 0;
+    operandsArray.length = 0;
+    operatorsArray.length = 0;
+    if (result !== Infinity && result !== -Infinity) {
+      inputArray.push(result.toFixed(2));
+    }
   }
-  let result = parseFloat(operandsArray.pop());
-  display.innerHTML = result.toFixed(2);
-  
-  inputArray.length = 0;
-  operandsArray.length = 0;
-  operatorsArray.length = 0;
-  inputArray.push(result.toFixed(2));
+  else {
+    console.log('cannot operate on fewer than 2 operands or fewer than one operator');
+    inputArray.length = 0;
+    operandsArray.length = 0;
+    operatorsArray.length = 0;
+  }
 })
 
 clear.addEventListener('click', function(event) {
@@ -77,13 +90,7 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
-  if (b == 0) {
-    console.log('b is zero');
-    display.innerHTML = 'Try again buddy';
-  }
-  else {
     return a / b;
-  }
 }
 
 function operate(operator, a, b) {
